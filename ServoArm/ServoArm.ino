@@ -23,6 +23,8 @@ if (Serial.available()){
 
   a = data.indexOf("a");
   A = data.indexOf("A");
+  b = data.indexOf("b");
+  B = data.indexOf("B");
 
   if (a != -1 && A != -1){
     jawPos = (data.substring(a+1, A)).toInt();
