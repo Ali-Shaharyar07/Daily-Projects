@@ -3,7 +3,7 @@
 Servo jawServo;
 Servo jawBaseServo;
 
-int a, A, b, B, jawPos, jawBasePos;
+int a, A, b, B, c, C, jawPos, jawBasePos;
 
 String data, jawData, jawBaseData;
 void setup() {
