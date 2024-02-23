@@ -16,10 +16,7 @@ Serial.begin(9600);
 
 void loop() {
   // put your main code here, to run repeatedly:
-
-if (Serial.available()){
-
-  data = Serial.readStringUntil("\r");
+  data = Serial.readStringUntil('\r');
 
   a = data.indexOf("a");
   A = data.indexOf("A");
@@ -37,8 +34,4 @@ if (Serial.available()){
     //Serial.println("JawBase: "+ String(jawBasePos));
     jawBaseServo.write(jawBasePos);
   }
-
-}
-
-
 }
