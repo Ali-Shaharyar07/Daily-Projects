@@ -68,7 +68,7 @@ if (read[0] == 0 && read[1] == 1 && read[2] == 1 && read[3] == 1 && read[4] == 1
   error = -4;
 }
 //Serial.println(String(error));
-Serial.println(String(read[0]) +","+ String(read[1]) +","+ String(read[2]) +","+ String(read[3]) +","+ String(read[4])+",");
+Serial.println(String(read[0]) +","+ String(read[1]) +","+ String(read[2]) +","+ String(read[3]) +","+ String(read[4])+",    "+String(error));
 
 if (error == 0){
   forward(255, 255);
