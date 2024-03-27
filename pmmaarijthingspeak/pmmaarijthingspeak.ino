@@ -27,6 +27,17 @@ void setup() {
   ThingSpeak.begin(client);  // Initialize ThingSpeak
   Wire.begin();
 
+ if(WiFi.status() != WL_CONNECTED) {
+   Serial.print("Attempting to connect to SSID: ");
+   Serial.println(ssid);
+      WiFi.begin(ssid, pass);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(100);
+      digitalWrite(LED_BUILTIN, HIGH);  // Connect to WPA/WPA2 network. Change this line if using open or WEP network
+      Serial.print(".");
+      delay(3000);  
+      
+   } 
 }
 struct pms5003data {
   uint16_t framelen;
@@ -82,27 +93,11 @@ boolean readPMSdata(Stream *s) {
 void loop() {
 
   // Connect or reconnect to WiFi
-  if(WiFi.status() != WL_CONNECTED){
-   // Serial.print("Attempting to connect to SSID: ");
-   //Serial.println(ssid);
-    while(WiFi.status() != WL_CONNECTED){
-      WiFi.begin(ssid, pass);
-      digitalWrite(LED_BUILTIN, LOW);
-      delay(100);
-      digitalWrite(LED_BUILTIN, HIGH);  // Connect to WPA/WPA2 network. Change this line if using open or WEP network
-      //Serial.print(".");
-      delay(3000);  
-      //if(WiFi.status() != WL_CONNECTED){  
-       // WiFi.begin(ssid2, pass2);
-      //digitalWrite(LED_BUILTIN, LOW);
-      //delay(100);
-      //digitalWrite(LED_BUILTIN, HIGH);  // Connect to WPA/WPA2 network. Change this line if using open or WEP network
-      //Serial.print(".");
-      //delay(3000);  
-   // } 
+ 
+
     digitalWrite(LED_BUILTIN, LOW);
-    //Serial.println("\nConnected.");
-  }
+    Serial.println("\nConnected.");
+  
   if (readPMSdata(&pmsSerial)){
   // set the fields with the values
   if(data.pm10_env != 0){
@@ -144,4 +139,4 @@ void loop() {
   }
  
   delay(20000); // Wait 20 seconds to update the channel again
-}}
+}
