@@ -1,38 +1,38 @@
 
 #include "ThingSpeak.h" //install library for thing speak
 #include <ESP8266WiFi.h>
-#include <DHT.h>
 #include <Wire.h>
+#include "Adafruit_PM25AQI.h"
+#include <SoftwareSerial.h>
 
 char ssid[] = "MTGazette";        // your network SSID (name) 
 char pass[] = "delta173";    // your network password
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
 WiFiClient  client;
-#define DHTPIN 4
-#define DHTTYPE DHT11
 
-unsigned long myChannelNumber =  2442964;
-const char * myWriteAPIKey = "T9UW4YIMG7OLH06L";
+
+unsigned long myChannelNumber =  2482731;
+const char * myWriteAPIKey = "UV38RUJ6KSOCYGHR";
 
 // Initialize our values
 String myStatus = "";
 
-DHT dht(DHTPIN, DHTTYPE);
+SoftwareSerial pmSerial(4, 3);
 
-
+Adafruit_PM25AQI aqi = Adafruit_PM25AQI();
 
 void setup() {
   Serial.begin(115200);  //Initialize serial
-
-  //WiFi.mode(WIFI_STA);   
+  delay(1000);
+   
   ThingSpeak.begin(client);  // Initialize ThingSpeak
-  dht.begin();
+  //pmSerial.begin(9600);
   Wire.begin();
-  pinMode(2, OUTPUT);
 }
 
 void loop() {
-
+  PM25_AQI_Data data;
+  aqi.read(&data);
   // Connect or reconnect to WiFi
   if(WiFi.status() != WL_CONNECTED){
     Serial.print("Attempting to connect to SSID: ");
@@ -51,15 +51,31 @@ void loop() {
   }
 
  
-  Serial.print("Temp: ");
-  Serial.print(dht.readTemperature());
-  Serial.print("\t\tHumidity: ");
-  Serial.print(dht.readHumidity());
-  Serial.print("% H");
+  Serial.print(F("PM 1.0: ")); Serial.print(data.pm10_env); 
+  Serial.print(F("\t\tPM 2.5: ")); Serial.print(data.pm25_env);
+  Serial.print(F("\t\tPM 10: ")); Serial.println(data.pm100_env);
+
+  Serial.print(F("Particles > 0.3um / 0.1L air:")); Serial.println(data.particles_03um); 
+
+  Serial.print(F("Particles > 1.0um / 0.1L air:")); Serial.println(data.particles_10um);
+
+  Serial.print(F("Particles > 2.5um / 0.1L air:")); Serial.println(data.particles_25um);
+  
+  Serial.print(F("Particles > 5.0um / 0.1L air:")); Serial.println(data.particles_50um);
+
+  Serial.print(F("Particles > 10 um / 0.1L air:")); Serial.println(data.particles_100um);
+  
 
   // set the fields with the values
-  ThingSpeak.setField(1, dht.readTemperature());
-  ThingSpeak.setField(2, dht.readHumidity());
+  ThingSpeak.setField(1, data.pm10_env);
+  ThingSpeak.setField(2, data.pm25_env);
+  ThingSpeak.setField(3, data.pm100_env);
+  ThingSpeak.setField(4, data.particles_03um);
+  ThingSpeak.setField(5, data.particles_10um);
+  ThingSpeak.setField(6, data.particles_25um);
+  ThingSpeak.setField(7, data.particles_50um);
+  ThingSpeak.setField(8, data.particles_100um);
+
 
   
   // set the status
