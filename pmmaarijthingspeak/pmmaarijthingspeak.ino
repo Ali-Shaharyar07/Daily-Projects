@@ -2,6 +2,8 @@
 #include <ESP8266WiFi.h>
 #include <SoftwareSerial.h>
 #include <Wire.h>
+#include <MQ131.h>
+
 SoftwareSerial pmsSerial(D6, D7);
 
 char ssid[] = "ROBOTICS_LAB";        // your network SSID (name) 
@@ -11,7 +13,7 @@ char pass2[] = "bravo173";     // your network password
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
 WiFiClient  client;
 
-unsigned long myChannelNumber =  2482731;
+unsigned long myChannelNumber = 2482731;
 const char * myWriteAPIKey = "04N4KNROQIBKLWVE";
 // Initialize our values
 String myStatus = "";
@@ -24,20 +26,27 @@ void setup() {
   // sensor baud rate is 9600
   pmsSerial.begin(9600);
   //WiFi.mode(WIFI_STA);   
+  MQ131.begin(2,A0, LOW_CONCENTRATION, 1000000);  
+  Serial.println("Calibrating");
+  MQ131.calibrate();
+  Serial.println("Calibrated");
   ThingSpeak.begin(client);  // Initialize ThingSpeak
   Wire.begin();
-
- if(WiFi.status() != WL_CONNECTED) {
-   Serial.print("Attempting to connect to SSID: ");
-   Serial.println(ssid);
-      WiFi.begin(ssid, pass);
-      digitalWrite(LED_BUILTIN, LOW);
-      delay(100);
-      digitalWrite(LED_BUILTIN, HIGH);  // Connect to WPA/WPA2 network. Change this line if using open or WEP network
-      Serial.print(".");
-      delay(3000);  
+ Serial.print("Attempting to connect to SSID: ");
+ Serial.println(ssid);
+//  while(WiFi.status() != WL_CONNECTED) {
+  
+   
+//       WiFi.begin(ssid, pass);
+//       digitalWrite(LED_BUILTIN, LOW);
+//       delay(100);
+//       digitalWrite(LED_BUILTIN, HIGH);  // Connect to WPA/WPA2 network. Change this line if using open or WEP network
+//       Serial.print(".");
+//       delay(5000);  
       
-   } 
+//    } 
+//    digitalWrite(LED_BUILTIN, LOW);
+//    Serial.println("Connected to "+ String(ssid));
 }
 struct pms5003data {
   uint16_t framelen;
@@ -92,12 +101,30 @@ boolean readPMSdata(Stream *s) {
 }
 void loop() {
 
-  // Connect or reconnect to WiFi
- 
-
-    digitalWrite(LED_BUILTIN, LOW);
-    Serial.println("\nConnected.");
+  while(WiFi.status() != WL_CONNECTED) {
   
+   
+      WiFi.begin(ssid, pass);
+      digitalWrite(LED_BUILTIN, LOW);
+      delay(100);
+      digitalWrite(LED_BUILTIN, HIGH);  // Connect to WPA/WPA2 network. Change this line if using open or WEP network
+      Serial.print(".");
+      delay(5000);  
+      
+   } 
+   digitalWrite(LED_BUILTIN, LOW);
+   Serial.println("Connected to "+ String(ssid));
+
+  // Connect or reconnect to WiFi
+  Serial.println("Sampling....");
+  MQ131.sample();
+  Serial.print("Concentration O3 : ");
+  Serial.print(MQ131.getO3(PPM));
+  Serial.println(" ppm");
+  Serial.print("Concentration O3 : ");
+  Serial.print(MQ131.getO3(MG_M3));
+  Serial.println(" mg/m3");
+
   if (readPMSdata(&pmsSerial)){
   // set the fields with the values
   if(data.pm10_env != 0){
@@ -107,8 +134,8 @@ void loop() {
     ThingSpeak.setField(4, data.particles_03um);
     ThingSpeak.setField(5, data.particles_10um);
     ThingSpeak.setField(6, data.particles_25um);
-    ThingSpeak.setField(7, data.particles_50um);
-    ThingSpeak.setField(8, data.particles_100um);
+    ThingSpeak.setField(7, MQ131.getO3(PPM));
+    ThingSpeak.setField(8, MQ131.getO3(MG_M3));
   }
   //Serial.println();
    
@@ -135,7 +162,7 @@ void loop() {
     Serial.println("Channel update successful.");
   }
   else{
-    //Serial.println("Problem updating channel. HTTP error code " + String(x));
+    Serial.println("Problem updating channel. HTTP error code " + String(x));
   }
  
   delay(20000); // Wait 20 seconds to update the channel again
