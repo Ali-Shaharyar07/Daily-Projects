@@ -106,10 +106,10 @@ void loop() {
    
       WiFi.begin(ssid, pass);
       digitalWrite(LED_BUILTIN, LOW);
-      delay(100);
+      delay(1000);
       digitalWrite(LED_BUILTIN, HIGH);  // Connect to WPA/WPA2 network. Change this line if using open or WEP network
       Serial.print(".");
-      delay(5000);  
+      delay(4000);  
       
    } 
    digitalWrite(LED_BUILTIN, LOW);
