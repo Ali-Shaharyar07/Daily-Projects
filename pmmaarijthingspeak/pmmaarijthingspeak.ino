@@ -7,7 +7,7 @@
 SoftwareSerial pmsSerial(D6, D7);
 
 char ssid[] = "ROBOTICS_LAB";        // your network SSID (name) 
-char pass[] = "PAKistan";
+char pass[] = "PaKiStAn";
 char ssid2[] = "MTTV 5G";        // your network SSID (name) 
 char pass2[] = "bravo173";     // your network password
 int keyIndex = 0;            // your network key Index number (needed only for WEP)
@@ -25,7 +25,8 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   // sensor baud rate is 9600
   pmsSerial.begin(9600);
-  //WiFi.mode(WIFI_STA);   
+  //WiFi.mode(WIFI_STA);  
+   
   MQ131.begin(2,A0, LOW_CONCENTRATION, 1000000);  
   Serial.println("Calibrating");
   MQ131.calibrate();

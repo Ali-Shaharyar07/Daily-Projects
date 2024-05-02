@@ -18,7 +18,7 @@ void loop() {
     SCREEN_Write(0x30, i+1);
     SCREEN_Write(0x40, j*10);
     delay(1000);
-    Serial.println("i-"+String(i)+"   j-"+String(j));
+    Serial.println("i-"+String(i)+"   j-"+String(j)); 
     j = j + 1;
   }
 
