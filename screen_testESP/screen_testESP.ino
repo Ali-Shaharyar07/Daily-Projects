@@ -32,12 +32,15 @@ void setup() {
 
   MQ131.begin(2, A0, LOW_CONCENTRATION, 1000000);
   Serial.println("Calibrating");
+  SCREEN_Serial_Write(0x70, 0);
   MQ131.calibrate();
   Serial.println("Calibrated");
+  SCREEN_Serial_Write(0x70, 1);
   ThingSpeak.begin(client);  // Initialize ThingSpeak
   Wire.begin();
   Serial.print("Attempting to connect to SSID: ");
   Serial.println(ssid);
+  WiFi.begin(ssid, pass);
 }
 struct pms5003data {
   uint16_t framelen;
@@ -97,12 +100,15 @@ void loop() {
 
     WiFi.begin(ssid, pass);
     digitalWrite(LED_BUILTIN, LOW);
+    SCREEN_Serial_Write(0x50, 0);
     delay(1000);
     digitalWrite(LED_BUILTIN, HIGH);  // Connect to WPA/WPA2 network. Change this line if using open or WEP network
+    SCREEN_Serial_Write(0x50, 1);
     Serial.print(".");
     delay(4000);
   }
   digitalWrite(LED_BUILTIN, LOW);
+  SCREEN_Serial_Write(0x50, 1);
   Serial.println("Connected to " + String(ssid));
 
   // Connect or reconnect to WiFi
@@ -126,7 +132,7 @@ void loop() {
       ThingSpeak.setField(6, data.particles_25um);
       ThingSpeak.setField(7, MQ131.getO3(PPM));
       ThingSpeak.setField(8, MQ131.getO3(MG_M3));
-
+      //SCREEN_Serial_Write(0x60, 0);
       SCREEN_Write(0x10, data.pm25_env);                   // 127
       SCREEN_Write(0x20, (int)(MQ131.getO3(PPM) * 1000));  // 0.01241
       Serial.print("rounded o3: " + String((int)(MQ131.getO3(PPM) * 1000)));
@@ -171,7 +177,9 @@ void loop() {
   int x = ThingSpeak.writeFields(myChannelNumber, myWriteAPIKey);
   if (x == 200) {
     Serial.println("Channel update successful.");
+    SCREEN_Serial_Write(0x50, 0);
   } else {
+    SCREEN_Serial_Write(0x50, 1);
     Serial.println("Problem updating channel. HTTP error code " + String(x));
   }
 
