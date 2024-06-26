@@ -1,12 +1,12 @@
-#include <Servo.h>
+#include <Servo.h> // Including servo library
 Servo s1;
 
-#define D A1
-#define U A2// more light = lower reading   +-100 margin    high reading = less light
+#define D A1  // Declaring pins for the LDRs
+#define U A2  // The basis on which our LDRs work is more light = lower reading OR high reading = less light
 
 
 int uR, dR;
-int pos = 127;
+int pos = 127; // Setting a default position
 bool margin;
 
 void setup() {
@@ -19,15 +19,16 @@ s1.write(pos);
 }
 
 void loop() {
- delay(10);
   // put your main code here, to run repeatedly:
-reading();
-margin = marginCheck(uR, dR);
-Serial.println("U: " + String(uR) + "  D: " + String(dR) + " Margin: " + String(margin) + " pos: " + String(pos));
+
+  delay(10);
+  reading();      //Calling a function to read the LDRs 
+  margin = marginCheck(uR, dR); // Calling a function to check whether the measured values are within a certain range of each other
+  Serial.println("U: " + String(uR) + "  D: " + String(dR) + " Margin: " + String(margin) + " pos: " + String(pos));
 while(!margin){
-  if(dR > uR){
+  if(dR > uR){ // If they aren't then move accordingly
     pos+= 1;
-    if(pos>180){pos = 180;}
+    if(pos>180){pos = 180;} // This statement is to fix a bug that would try to make the servo move more than 180 degrees
     Serial.println("inc");
     s1.write(pos);
   } else{
@@ -43,7 +44,7 @@ while(!margin){
 }
 
 bool marginCheck(int a, int b){
-  if (abs(a-b) <= 200){
+  if (abs(a-b) <= 200){ // Here the range is set to 200 (can vary)
     return true;
   } else {return false;}
 }
